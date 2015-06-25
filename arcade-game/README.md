@@ -1,6 +1,15 @@
 Udacity - Project 3 - FROGGER
-Ryan Roethle
+Ryan Roethle - 6/24/15
 ===============================
+
+INSTALLATION (HOW TO PLAY GAME)
+===================================================================================
+Download my zip file located here https://github.com/minkdogg/Udacity-Project3.git 
+and open the top level folder "arcade-game".
+After downloading, double click on index.html (or run in your favorite browser).
+Game works best using Google Chrome.
+=====================================================================================
+
 
 Hello! Welcome to my intense action Frogger game!
 

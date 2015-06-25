@@ -6,6 +6,7 @@
  * the canvas' context (ctx) object globally available to make writing app.js
  * a little simpler to work with.
  */
+
 var Engine = (function(global) {
      /* create the canvas element, grab the 2D context for that canvas
      * set the canvas elements height/width and add it to the DOM.
@@ -14,16 +15,18 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
+		enemyBugs,
+		gem,
         lastTime;
-		t = Date.now()-lastTime;
+	var t = Date.now()-lastTime;
 		//sets time counter equal to 0.
-		timeCount = 0;
+	var timeCount = 0;
 	//sets the canvas width and height
     canvas.width = 505;
     canvas.height = 800;
     //header and footer offset used to draw the game board as title and characters were added.
-	headerOffset = 50;
-	footerOffset = 150;
+	var headerOffset = 50;
+	var footerOffset = 150;
 	//appends canvas to body of html.
     doc.body.appendChild(canvas);
     /* This function serves as the kickoff point for the game loop itself
@@ -46,7 +49,7 @@ var Engine = (function(global) {
         // initialy makes sure level is set to 1 and not 0 so as not to divide by 0.
 		 if (level < 1){
 			 level = 1;
-		 };
+		 }
 		 /* main game engine logic for determining enemies and gems
 		  * initially every 35 seconds a Super Fast enemy is displayed and this time
 		  * is decreased every level increase. Fast enemy's are released every 15 seconds
@@ -54,35 +57,35 @@ var Engine = (function(global) {
 		  * and regular slow enemies a little over 7 seconds. These are constants over the course
 		  * of the game.
 		 */
-		 if (timeCount % Math.floor(2100/level) == 0){
+		 if (timeCount % Math.floor(2100/level) === 0){
 		 	enemyBugs = new SuperFastEnemy();
-		 };
-		 if (timeCount % Math.floor(440) == 0){
+		 }
+		 if (timeCount % Math.floor(440) === 0){
 		 	enemyBugs = new Enemy();
-		 };
-		 if (timeCount % Math.floor(200) == 0){
+		 }
+		 if (timeCount % Math.floor(200) === 0){
 		 	enemyBugs = new MediumEnemy();
-		 };
-		 if (timeCount % Math.floor(900/level)== 0){
-			 fastBugs = new FastEnemy();
-		 };
+		 }
+		 if (timeCount % Math.floor(900/level) === 0){
+			 enemyBugs = new FastEnemy();
+		 }
 		 /* Gems are generated every 20 seconds and disapper based on their max time.
 		  * A random number is generated and if the number is below .7, a blue gem is generated.
 		  * If the number is below .9 (20% chance) then a green gem, and with a 10% chance
 		  * a orange gem is generated.
 		 */
-		if (timeCount % 1200 == 0){
-			randomGemNumber = Math.random();
-			if (randomGemNumber < .7){
-				bluegem = new Gem();
+		if (timeCount % 1200 === 0){
+			var randomGemNumber = Math.random();
+			if (randomGemNumber < 0.7){
+				gem = new Gem();
 			}
-			 else if(randomGemNumber < .9){
-				greengem = new GreenGem();
+			 else if(randomGemNumber < 0.9){
+				gem = new GreenGem();
 			}
 			else {
-				orangegem = new OrangeGem();
-			};
-		};
+				gem = new OrangeGem();
+			}
+		}
 		/* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
          */ 
@@ -97,7 +100,7 @@ var Engine = (function(global) {
          * function again as soon as the browser is able to draw another frame.
          */
         win.requestAnimationFrame(main);
-    };
+    }
 
     /* This function does some initial setup that should only occur once,
      * particularly setting the lastTime variable that is required for the
@@ -107,7 +110,7 @@ var Engine = (function(global) {
         reset();
         lastTime = Date.now();
         main();
-    };
+    }
 
     /* This function is called by main (our game loop) and itself calls all
      * of the functions which are needed to update the entities (enemy, gems).
@@ -119,7 +122,7 @@ var Engine = (function(global) {
         updateEntities(dt);
         checkCollisions();
 		checkGameStatus();
-    };
+    }
 
     /* This is called by the update function  and loops through all of the
      * objects within the allEnemies array as defined in app.js and calls
@@ -133,7 +136,7 @@ var Engine = (function(global) {
 		allGems.forEach(function(gem) {
             gem.update();
         });	
-    };
+    }
     /* This function initially draws the "game level", it will then call
      * the renderEntities function. This function is called every
      * game tick (or loop of the game engine)
@@ -161,9 +164,9 @@ var Engine = (function(global) {
 							   'images/char-princess-girl.png'
 								],
 			//gem images added for each gem used in game play.				
-			gemImages = ['images/Gem Blue.png',
-						 'images/Gem Green.png',
-						 'images/Gem Orange.png'
+			gemImages = ['images/GemBlue.png',
+						 'images/GemGreen.png',
+						 'images/GemOrange.png'
 						 ];
 			
 
@@ -182,14 +185,14 @@ var Engine = (function(global) {
                  * headeroffset used because canvas was expanded to include title, score, and lives.
                  */
                 ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83 + headerOffset);
-            };
-        };
+            }
+        }
         /* The drawImage function will again draw each character image at the bottom
          * after the board is drawn. The footer offset is used for positioning of characters.
         */
-		for (imageCharacter in characterImages){
-			ctx.drawImage(Resources.get(characterImages[imageCharacter]), 100 * imageCharacter, canvas.height - footerOffset);
-		};
+		for (var image = 0; image < characterImages.length; image ++){
+			ctx.drawImage(Resources.get(characterImages[image]), 100 * image, canvas.height - footerOffset);
+		}
 
 		/* Lives, Score, and Player Character Label is drawn at the static
 		 * locations used in fillText. The area is cleared first with clearRect.
@@ -201,13 +204,13 @@ var Engine = (function(global) {
 		livesLabel.fillText("LIVES", 0, 25);
 		
 		var scoreLabel = canvas.getContext("2d");
-		scoreLabel.clearRect(450,0,50,25)
+		scoreLabel.clearRect(450,0,50,25);
         scoreLabel.fillStyle = "blue";
 		scoreLabel.font = "16px Arial";
 		scoreLabel.fillText("SCORE", 450, 25);
 		
 		var playerCharacter = canvas.getContext("2d");
-		scoreLabel.clearRect(100,650,350,50)
+		scoreLabel.clearRect(100,650,350,50);
         playerCharacter.fillStyle = "blue";
 		scoreLabel.font = "42px Futura, Helvetica, sans-serif";
 		scoreLabel.fillText("Select Character", 100, 685);
@@ -233,7 +236,7 @@ var Engine = (function(global) {
 			var left = jitter / 2 - Math.random() * jitter;
 			var top = jitter / 2 - Math.random() * jitter;
 			ctx.strokeText(text, left + offsetX, top + offsetY + 60);
-		};
+		}
 		ctx.strokeStyle = "rgba(0,0,0,0.20)";
 		ctx.strokeText(text, offsetX, offsetY + 60);
 		
@@ -271,7 +274,7 @@ var Engine = (function(global) {
          */
 		allGems.forEach(function(gem){
 			gem.render();
-		})
+		});
 
         player.render();
 		
@@ -280,7 +283,7 @@ var Engine = (function(global) {
 		livesValue.clearRect(75,0,25,25);
         livesValue.fillStyle = "blue";
 		livesValue.font = "16px Arial";
-		lives = player.lives;
+		var lives = player.lives;
 		livesValue.fillText(lives, 75, 25);
 		
 		//clear player.score variable previously drawn on screen and update with current score.
@@ -288,7 +291,7 @@ var Engine = (function(global) {
 		scoreValue.clearRect(375,0,75,25);
         scoreValue.fillStyle = "blue";
 		scoreValue.font = "16px Arial";
-		score = player.score;
+		var score = player.score;
 		scoreValue.fillText(score, 400, 25);
 		
 		//when lives = 0 then display "Game Over" on canvas.
@@ -297,8 +300,8 @@ var Engine = (function(global) {
 			gameOver.fillStyle = "black";
 			gameOver.font = "64px Arial";
 			gameOver.fillText("GAME OVER", 60, 350);
-		};
-    };
+		}
+    }
 	
 	/*checks to see if a player's max and min x position of image will intersect
 	 * max x position of enemy. If either of player's x position is less than
@@ -306,11 +309,11 @@ var Engine = (function(global) {
 	*/
 	function checkCollisions(){
 		allEnemies.forEach(function(enemy){
-			if (Math.abs(enemy.x - player.x) < 77 && enemy.y == player.y){
+			if (Math.abs(enemy.x - player.x) < 77 && enemy.y === player.y){
 				player.x = 200;
 				player.y = 480;
 				player.lives -= 1;
-			};
+			}
 		});
 	/*checks to see if a player's max and min x position of image will intersect
 	 * the gem x center position. If the player's x position is less than
@@ -319,14 +322,14 @@ var Engine = (function(global) {
 	 * better on the game board.
 	*/
 		allGems.forEach(function(gem){
-			if (Math.abs(gem.x - player.x) < 51 && gem.y == (player.y + 85)){
+			if (Math.abs(gem.x - player.x) < 51 && gem.y === (player.y + 85)){
 				player.score += gem.score;
-				number = allGems.indexOf(gem);
+				var number = allGems.indexOf(gem);
 		        allGems.splice(number,1);
-			};
+			}
 		});
 		
-	};
+	}
 	
 	/*checks to make sure a player has more than 0 lives.
 	 * if player has 0 lives, the character is moved back to the beginning and
@@ -334,15 +337,15 @@ var Engine = (function(global) {
 	 * to select reset to start a new game.
 	 */
 	function checkGameStatus(){
-		checkLives = player.lives
+		var checkLives = player.lives;
 		if (checkLives <=0){
 			player.lives = 0;
 			player.x = 200;
 			player.y = 480;
 			allEnemies = [];
 			allGems = [];
-		};
-	};
+		}
+	}
 
     /* This function resets the game to initial conditions.
      */
@@ -354,7 +357,7 @@ var Engine = (function(global) {
 		allEnemies = [];
 		allGems = [];
 		timeCount = 0;
-    };
+    }
 
     /* Go ahead and load all of the images we know we're going to need to
      * draw our game level. Then set init as the callback method, so that when
@@ -370,9 +373,9 @@ var Engine = (function(global) {
 		'images/char-horn-girl.png',
 		'images/char-pink-girl.png',
 		'images/char-princess-girl.png',
-		'images/Gem Blue.png',
-		'images/Gem Green.png',
-		'images/Gem Orange.png',
+		'images/GemBlue.png',
+		'images/GemGreen.png',
+		'images/GemOrange.png',
     ]);
     Resources.onReady(init);
 
@@ -385,9 +388,9 @@ var Engine = (function(global) {
 //returns mouse position on canvas regardless of browser resizing.
 function getMousePos(canvas, evt) {
     var rect = canvas.getBoundingClientRect();
-	newX = evt.clientX - rect.left;
-	newY = evt.clientY - rect.top;
-	canvasPosition = [newX,newY];
+	var newX = evt.clientX - rect.left;
+	var newY = evt.clientY - rect.top;
+	var canvasPosition = [newX,newY];
 	return canvasPosition;
 }
 
@@ -408,14 +411,14 @@ canvas.addEventListener('click', function(evt) {
 			player.sprite = 'images/char-pink-girl.png';
 		} else if (mousePos[0] >= 400 && mousePos[0] < 500){
 			player.sprite = 'images/char-princess-girl.png';
-		};
-	};
+		}
+	}
 	//used for reset button check.
 	if (mousePos[1] > 50 && mousePos[1] < 90){
 		if (mousePos[0] > 0 && mousePos[0] < 70){
 			reset();
-		};
-	};
+		}
+	}
 	
   }, false);
 //end of functions.
